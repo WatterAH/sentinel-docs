@@ -26,7 +26,7 @@
     <div class="topbar-divider"></div>
     <span class="topbar-pkg">@sentinel-sdk</span>
     <div class="topbar-right">
-      <span class="badge-version">v1.0.0</span>
+      <span class="badge-version">v1.0.3</span>
       <button class="btn-icon" id="theme-toggle" title="Toggle theme" aria-label="Toggle theme">
         <svg id="icon-sun" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
         <svg id="icon-moon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -49,7 +49,7 @@
     <a class="sidebar-link" href="#sentinel-class" onclick="setActive(this)">Sentinel</a>
     <a class="sidebar-link sub" href="#constructor" onclick="setActive(this)">constructor</a>
     <a class="sidebar-link sub" href="#analyze" onclick="setActive(this)">analyze()</a>
-    <a class="sidebar-link sub" href="#analyzeMessage" onclick="setActive(this)">analyzeMessage()</a>
+    <a class="sidebar-link sub" href="#localAnalyze" onclick="setActive(this)">localAnalyze()</a>
 
     <div class="sidebar-section-label">Tipos</div>
     <a class="sidebar-link" href="#sentinelresult" onclick="setActive(this)">SentinelResult</a>
@@ -139,20 +139,25 @@
       </div>
 
       <h3>Análisis Local (Sin conexión)</h3>
-      <p>Análisis local instantáneo sin llamadas a la API. Útil para prefiltrado o entornos sin conexión.</p>
-      <div class="code-block">
-        <div class="code-block-header"><span>index.ts</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-        <pre><code><span class="kw">const</span> <span class="pu">{</span> data<span class="pu">,</span> error <span class="pu">} =</span> sentinel<span class="pu">.</span><span class="fn">analyzeMessage</span><span class="pu">(</span>
-  <span class="str">"te mando lana si me ayudas con un jale"</span>
-<span class="pu">);</span>
+<p>Análisis local instantáneo sin llamadas a la API. Útil para prefiltrado o entornos sin conexión.</p>
+<div class="code-block">
+  <div class="code-block-header">
+    <span>index.ts</span>
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+  </div>
+  <pre><code><span class="kw">const</span> <span class="pu">{</span> data<span class="pu">,</span> error <span class="pu">} =</span> sentinel<span class="pu">.</span><span class="fn">localAnalyze</span><span class="pu">([</span>
+  <span class="pu">{</span> text<span class="pu">:</span> <span class="str">"te mando lana si me ayudas con un jale"</span> <span class="pu">},</span>
+  <span class="pu">{</span> text<span class="pu">:</span> <span class="str">"trato de 300 pesos por noche"</span> <span class="pu">},</span>
+  <span class="pu">{</span> text<span class="pu">:</span> <span class="str">"es solo un jale, nomas es entregar un pakete"</span> <span class="pu">}</span>
+<span class="pu">]);</span>
 
 <span class="kw">if</span> <span class="pu">(!</span>error<span class="pu">) {</span>
-  console<span class="pu">.</span><span class="fn">log</span><span class="pu">(</span>data<span class="pu">.</span>score<span class="pu">);</span>        <span class="cm">// numeric score</span>
-  console<span class="pu">.</span><span class="fn">log</span><span class="pu">(</span>data<span class="pu">.</span>risk<span class="pu">);</span>         <span class="cm">// "MEDIUM"</span>
+  console<span class="pu">.</span><span class="fn">log</span><span class="pu">(</span>data<span class="pu">.</span>score<span class="pu">);</span>        <span class="cm">// numeric score</span>
+  console<span class="pu">.</span><span class="fn">log</span><span class="pu">(</span>data<span class="pu">.</span>risk<span class="pu">);</span>         <span class="cm">// "MEDIUM"</span>
   console<span class="pu">.</span><span class="fn">log</span><span class="pu">(</span>data<span class="pu">.</span>velocityFlag<span class="pu">);</span> <span class="cm">// false</span>
   console<span class="pu">.</span><span class="fn">log</span><span class="pu">(</span>data<span class="pu">.</span>layers<span class="pu">.</span>v3<span class="pu">.</span>terms<span class="pu">);</span> <span class="cm">// ["REC-005"]</span>
 <span class="pu">}</span></code></pre>
-      </div>
+</div>
 
       <h3>Manejo de recomendaciones UX</h3>
       <div class="code-block">
@@ -245,25 +250,38 @@
       </div>
       <p><strong>Retorna</strong> — <code>Promise&lt;SentinelResult&lt;ApiAnalysisResponse&gt;&gt;</code></p>
 
-      <h3 id="analyzeMessage">analyzeMessage()</h3>
-      <p>Análisis local de un mensaje. Sin llamadas de red, sin contexto de sesión. Retorna el resultado del motor. Síncrono.</p>
+      <h3 id="localAnalyze">localAnalyze()</h3>
+      <p>Análisis local de una lista de mensajes. Sin llamadas de red, sin contexto de sesión. Retorna el resultado del motor. Síncrono.</p>
       <div class="code-block">
         <div class="code-block-header"><span>Signature</span></div>
-        <pre><code><span class="fn">analyzeMessage</span><span class="pu">(</span>text<span class="pu">:</span> <span class="ty">string</span><span class="pu">):</span> <span class="ty">SentinelResult</span><span class="pu">&lt;</span><span class="ty">SentinelAnalysisResponse</span><span class="pu">&gt;</span></code></pre>
+        <pre><code><span class="fn">localAnalyze</span><span class="pu">(</span>text<span class="pu">:</span> <span class="ty">string</span><span class="pu">):</span> <span class="ty">SentinelResult</span><span class="pu">&lt;</span><span class="ty">SentinelAnalysisResponse</span><span class="pu">&gt;</span></code></pre>
       </div>
       <div class="table-wrap">
-        <table>
-          <thead><tr><th>Parámetro</th><th>Tipo</th><th>Descripción</th></tr></thead>
-          <tbody>
-            <tr><td class="prop">text</td><td><code>string</code></td><td class="req">required</td><td>Texto del mensaje a analizar.</td></tr>
-          </tbody>
-        </table>
-      </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Parámetro</th>
+        <th>Tipo</th>
+        <th>Descripción</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="prop">messages</td>
+        <td><code>Message[]</code></td>
+        <td>
+          <span class="req">required</span> 
+          Lista de mensajes a analizar. Si timestamps no son proporcionados, serán generados automáticamente.
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
       <p><strong>Retorna</strong> — <code>SentinelResult&lt;SentinelAnalysisResponse&gt;</code></p>
 
       <div class="callout info">
         <span class="callout-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:oklch(55% 0.18 220)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
-        <span><code>analyzeMessage()</code> es síncrono y retorna <code>SentinelAnalysisResponse</code> (el resultado del motor con desglose de capas), mientras que <code>analyze()</code> es asíncrono y retorna <code>ApiAnalysisResponse</code> (enriquecido con etapa, confianza y recomendación UX de la API).</span>
+        <span><code>localAnalyze()</code> es síncrono y retorna <code>SentinelAnalysisResponse</code> (el resultado del motor con desglose de capas), mientras que <code>analyze()</code> es asíncrono y retorna <code>ApiAnalysisResponse</code> (enriquecido con etapa, confianza y recomendación UX de la API).</span>
       </div>
     </section>
 
@@ -361,7 +379,7 @@
 
     <section class="doc-section" id="sentinelanalysisresponse">
       <h2>SentinelAnalysisResponse</h2>
-      <p>Retornado por <code>analyzeMessage()</code>. El resultado crudo del motor con el desglose completo por capa para auditoría y depuración.</p>
+      <p>Retornado por <code>localAnalyze()</code>. El resultado crudo del motor con el desglose completo por capa para auditoría y depuración.</p>
       <div class="code-block">
         <div class="code-block-header"><span>SentinelAnalysisResult.ts</span></div>
         <pre><code><span class="kw">interface</span> <span class="ty">SentinelAnalysisResponse</span> <span class="pu">{</span>
